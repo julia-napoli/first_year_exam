@@ -1,0 +1,53 @@
+---
+title: "First Year Exam Question 10"
+author: "Julia Napoli"
+date: "7/9/2022"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+PID: A59010574
+
+## Question 10
+
+First, we must download the most updated covid-19 data from the website provided by Barry.
+
+Now, let's read it into the workspace.
+
+```{r}
+covid_data <- read.csv("covid-19-variant-data.csv")
+```
+
+And now we can work on plotting the data. Let's get the ggplot, lubridate and dplyr libraries uploaded.
+
+```{r}
+library(ggplot2)
+library(lubridate, warn.conflicts = FALSE)
+library(dplyr)
+```
+
+Now we can think about plotting the data. First, let's erase the "total" and "other" rows that we don't need.
+```{r}
+# erase the "total" rows
+no_total_covid_data <- covid_data %>% filter(!grepl('Total', variant_name))
+
+# erase the "other" rows
+new_covid_data <- no_total_covid_data %>% filter(!grepl('Other', variant_name))
+```
+
+Now let's convert the date data into date variables in R. 
+```{r}
+new_covid_data$date <- as.POSIXct(new_covid_data$date)
+```
+
+
+
+```{r}
+covid_plot <- ggplot(data=new_covid_data, aes(x=date, y=percentage, group=variant_name, colour = variant_name)) +
+  geom_line() + theme(legend.title=element_blank()) + scale_x_datetime(date_breaks = '1 month', date_labels = "%b-%Y") + theme(axis.text.x = element_text(angle = 60, hjust = 1))
+
+print(covid_plot + ggtitle("Covid-19 Variants in California") + labs(y = "Percentage of sequenced specimens"))
+```
+
+All done!
